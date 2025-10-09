@@ -1,0 +1,17 @@
+# Ambiente virtual
+venv/
+# Arquivos Python compilados
+__pycache__/
+*.pyc
+*.pyo
+
+# PDFs gerados
+*.pdf
+
+# Arquivos temporários ou de backup
+*.bak
+*.tmp
+
+# Configurações de IDE
+.vscode/
+.idea/
