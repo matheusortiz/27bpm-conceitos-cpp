@@ -1,5 +1,5 @@
 # Ambiente virtual
-venv/
+venv-cpp/
 # Arquivos Python compilados
 __pycache__/
 *.pyc
