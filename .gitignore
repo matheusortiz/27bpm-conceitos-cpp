@@ -6,11 +6,16 @@ __pycache__/
 *.pyo
 
 # PDFs gerados
+fichas/
 *.pdf
 
 # Arquivos temporários ou de backup
 *.bak
 *.tmp
+
+# Arquivo de dados
+# dados.csv
+dados.xlsx
 
 # Configurações de IDE
 .vscode/
