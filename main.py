@@ -30,17 +30,17 @@ for idx, row in df_selected.iterrows():
 
     # Cabeçalho
     pdf.set_font("Arial", 'B', 12)
-    pdf.cell(0, 8, "POLÍCIA MILITAR DO PARANÁ", ln=True, align='C')
-    pdf.cell(0, 8, "4º COMANDO REGIONAL", ln=True, align='C')
-    pdf.cell(0, 8, "27º BATALHÃO DE POLÍCIA MILITAR", ln=True, align='C')
+    pdf.cell(0, 5, "POLÍCIA MILITAR DO PARANÁ", ln=True, align='C')
+    pdf.cell(0, 5, "4º COMANDO REGIONAL", ln=True, align='C')
+    pdf.cell(0, 5, "27º BATALHÃO DE POLÍCIA MILITAR", ln=True, align='C')
     pdf.ln(4)
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(0, 8, "FICHA DE INFORMAÇÃO E AVALIAÇÃO DE CONCEITO DE PRAÇA", ln=True, align='C')
+    pdf.set_font("Arial", 'BU', 12)
+    pdf.cell(0, 7, "FICHA DE INFORMAÇÃO E AVALIAÇÃO DE CONCEITO DE PRAÇA", ln=True, align='C')
     pdf.ln(4)
 
     # Começo da nova tabela (3 colunas x 2 linhas)
     col_width = (pdf.w - 2 * pdf.l_margin) / 3  # largura da página menos margens dividida por 3
-    row_height = 10
+    row_height = 6
     
     # Dados da tabela (3 col x 2 lin)
     table_data = [
@@ -59,7 +59,7 @@ for idx, row in df_selected.iterrows():
 
     # Começo da nova tabela (2 colunas x 2 linhas)
     col_width = (pdf.w - 2 * pdf.l_margin) / 2  # largura da página menos margens dividida por 3
-    row_height = 10
+    row_height = 6
     
     # Dados da tabela (3 col x 2 lin)
     table_data = [
@@ -82,7 +82,7 @@ for idx, row in df_selected.iterrows():
     
     # Começo da nova tabela (4 colunas x 1 linhas)
     col_width = (pdf.w - 2 * pdf.l_margin) / 4  # largura da página menos margens dividida por 3
-    row_height = 10
+    row_height = 6
     
     # Dados da tabela (3 col x 2 lin)
     table_data = [
@@ -103,7 +103,7 @@ for idx, row in df_selected.iterrows():
 
     # Começo da nova tabela (2 colunas x 5 linhas)
     col_width = (pdf.w - 2 * pdf.l_margin) / 2  # largura da página menos margens dividida por 3
-    row_height = 10
+    row_height = 6
     
     # Dados da tabela (3 col x 2 lin)
     table_data = [
@@ -113,6 +113,7 @@ for idx, row in df_selected.iterrows():
         ["APTIDÃO PROFISSIONAL", f"{conceitos[3]}"],
         ["DEDICAÇÃO AO TRABALHO", f"{conceitos[4]}"],
     ]
+
     # Imprime a tabela
     pdf.set_font("Arial", size=12)
     for row in table_data:
@@ -122,23 +123,112 @@ for idx, row in df_selected.iterrows():
     
     pdf.ln(5)  # Espaço após tabela
 
+    pdf.set_font("Arial", 'BU', 12)
+    pdf.cell(0, 8, "Observações importantes: ", ln=True)
+    pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 5, "Segue anexo cópia da FICHA DISCIPLINAR INDIVIDUAL devidamente autenticada pelo Oficial Chefe da SJD da unidade.")
+    pdf.multi_cell(0, 5, "Segue também anexo, a justificativa circunstanciada considerando o conceito EXCELENTE (ver isso) atribuído ao militar.")
 
-    pdf.ln(6)
     pdf.set_font("Arial", 'B', 12)
-    pdf.cell(0, 8, "CONCEITOS:", ln=True)
-    pdf.set_font("Arial", '', 12)
-    for i, conceito in enumerate(conceitos):
-        pdf.cell(0, 8, f"{col_names[i+1]}: {conceito}", ln=True)
-    pdf.ln(6)
-
-    # Observações finais / assinatura modelo
-    pdf.set_font("Arial", '', 12)
     hoje = datetime.today().strftime('%d/%m/%Y')
     pdf.cell(0, 8, f"Data: {hoje}", ln=True)
-    pdf.ln(12)
-    pdf.cell(0, 8, "_____________________________________________", ln=True)
-    pdf.cell(0, 5, "Ten.- Cel. QOEM PM Luiz Antonio Ferreira Junior", ln=True)
-    pdf.cell(0, 5, "Comandante do 27º BPM/4º CRPM", ln=True)
+    pdf.ln(8)
+    pdf.cell(0, 5, "_____________________________________________", ln=True, align='C')
+    pdf.set_font("Arial", '', 12)
+    pdf.cell(0, 5, "Ten.- Cel. QOEM PM Luiz Antonio Ferreira Junior,", ln=True, align='C')
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 5, "Comandante do 27º BPM/4º CRPM", ln=True, align='C')
+
+    # Começo da nova tabela
+    col_width = (pdf.w - 2 * pdf.l_margin)  # largura da página menos margens dividida por 3
+    row_height = 6
+    
+    # Dados da tabela (3 col x 2 lin)
+    table_data = [
+        ["Situação Processual"],
+        ["Está SUB-JUDICE  (  ) 		NADA CONSTA   ( X )"],
+        ["Observações: "],
+    ]
+
+    # Imprime a tabela
+    pdf.set_font("Times", 'B', size=12)  # Mudando para Times New Roman
+    for i, row in enumerate(table_data):
+        for cell in row:
+            if i == 0:  # Primeira linha
+                pdf.cell(col_width, row_height, txt=cell, border='TLR', align='C')  # Centralizado
+            elif i == len(table_data)-1:  # Última linha
+                pdf.cell(col_width, row_height, txt=cell, border='BLR')
+            else:  # Linhas do meio
+                pdf.cell(col_width, row_height, txt=cell, border='LR', align='C')  # Centralizado
+        pdf.ln(row_height)
+
+    pdf.ln(5)  # Espaço após tabela
+
+
+    # Começo da nova tabela
+    col_width = (pdf.w - 2 * pdf.l_margin)  # largura da página menos margens dividida por 3
+    row_height = 6
+    
+    # Dados da tabela (3 col x 2 lin)
+    table_data = [
+        ["ESTÁ RESPONDENDO A CONSELHO DE DISCIPLINA OU CONSELHO DE JUSTIFICAÇÃO?"],
+        ["SIM (  )		NÃO (  X   )"],
+    ]
+
+    # Imprime a tabela
+    pdf.set_font("Times", 'B', size=10)  # Mudando para Times New Roman
+    for i, row in enumerate(table_data):
+        for cell in row:
+            if i == 0:  # Primeira linha
+                pdf.cell(col_width, row_height, txt=cell, border='TLR', align='C')  # Centralizado
+            elif i == len(table_data)-1:  # Última linha
+                pdf.cell(col_width, row_height, txt=cell, border='BLR', align='C')  # Centralizado
+        pdf.ln(row_height)
+
+    pdf.ln(5)  # Espaço após tabela
+
+    pdf.set_font("Arial", 'B', 12)
+    hoje = datetime.today().strftime('%d/%m/%Y')
+    pdf.cell(0, 8, f"Data: {hoje}", ln=True)
+    pdf.ln(8)
+    pdf.cell(0, 8, "_____________________________________________", ln=True, align='C')
+    pdf.set_font("Arial", '', 12)
+    pdf.cell(0, 5, "1º Ten. QOEM PM Alaor Elias de Faria Junior,", ln=True, align='C')
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 5, "Resp. p/ Chefia da SJD do 27º BPM/4º CRPM", ln=True, align='C')
+
+    pdf.ln(6)
+
+    # segunda folha
+    pdf.add_page()
+    pdf.set_font("Arial", 'BU', 12)
+    pdf.cell(0, 5, "ANEXO A FICHA DE INFORMAÇÃO E AVALIAÇÃO DE CONCEITO", ln=True, align='C')
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 5, f"({nome})", ln=True, align='C')
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 8, "JUSTIFICATIVA QUANTO AO CONCEITO EXCELENTE (ver isso):", ln=True, align='C')
+    pdf.set_font("Arial", '', 12)
+    pdf.multi_cell(0, 5, "Acredito que esse campo tem que relativo. Ver isso aqui. Excelente Policial Militar dedicado e comprometido com a função que exerce, possui senso de responsabilidade, é disciplinado e educado, além de pontual. Apresenta iniciativa para as atividades inerentes ao bom andamento do serviço, busca soluções para os problemas quando apresentados. Demonstra-se sempre pronto para o serviço, preocupando-se em bem executá-lo. Dentro das suas funções, demonstra habilidade e eficiência. Possui postura ilibada na sociedade em que convive, representando bem a PMPR.")
+
+    pdf.ln(6)
+
+    MESES = {
+        1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
+        5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
+        9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+    }
+
+    hoje = datetime.today()
+    data_formatada = f"União da Vitória, {hoje.day} de {MESES[hoje.month]} de {hoje.year}."
+
+    pdf.cell(0, 8, f"{data_formatada}", ln=True, align='C')
+    pdf.ln(8)
+    pdf.cell(0, 5, "_____________________________________________", ln=True, align='C')
+    pdf.set_font("Arial", '', 12)
+    pdf.cell(0, 5, "Ten.- Cel. QOEM PM Luiz Antonio Ferreira Junior,", ln=True, align='C')
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 5, "Comandante do 27º BPM/4º CRPM", ln=True, align='C')
+
 
     # Salva PDF
     filename = f"fichas/ficha_{nome.replace(' ','_')}.pdf"
