@@ -38,22 +38,43 @@ for idx, row in df_selected.iterrows():
     pdf.cell(0, 7, "FICHA DE INFORMAÇÃO E AVALIAÇÃO DE CONCEITO DE PRAÇA", ln=True, align='C')
     pdf.ln(4)
 
-    # Começo da nova tabela (3 colunas x 2 linhas)
-    col_width = (pdf.w - 2 * pdf.l_margin) / 3  # largura da página menos margens dividida por 3
+    # Começo da nova tabela (3 colunas x 2 linhas) - largura dinâmica do NOME
+    page_width = pdf.w - 2 * pdf.l_margin
+    default_font_size = 12
+    pdf.set_font("Arial", 'B', default_font_size)
+    # calcula largura necessária para o nome (com pequena margem)
+    name_width_needed = pdf.get_string_width(str(nome)) + 6
+    max_name_frac = 0.7  # no máximo 70% da largura da página para o nome
+    max_name_w = page_width * max_name_frac
+
+    # reduz fonte se o nome for muito longo
+    font_size = default_font_size
+    pdf.set_font("Arial", 'B', font_size)
+    while name_width_needed > max_name_w and font_size > 6:
+        font_size -= 1
+        pdf.set_font("Arial", 'B', font_size)
+        name_width_needed = pdf.get_string_width(str(nome)) + 6
+
+    # define larguras das colunas
+    name_col_w = min(name_width_needed, max_name_w)
+    remaining = page_width - name_col_w
+    col2_w = col3_w = remaining / 2
     row_height = 6
-    
-    # Dados da tabela (3 col x 2 lin)
-    table_data = [
-        ["NOME/CPF", "GRADUAÇÃO", "COMPORTAMENTO"],
-        [f"{nome}", f"{graduacao}", f"{comportamento}"],
-    ]
-    
-    # Imprime a tabela
-    pdf.set_font("Arial", size=12)
-    for row in table_data:
-        for cell in row:
-            pdf.cell(col_width, row_height, txt=cell, border=1)
-        pdf.ln(row_height)
+
+    # Cabeçalhos da tabela
+    pdf.set_font("Arial", 'B', font_size)
+    headers = ["NOME/CPF", "GRADUAÇÃO", "COMPORTAMENTO"]
+    widths = [name_col_w, col2_w, col3_w]
+    for i, h in enumerate(headers):
+        pdf.cell(widths[i], row_height, txt=h, border=1)
+    pdf.ln(row_height)
+
+    # Conteúdo da linha (ajusta fonte normal)
+    pdf.set_font("Arial", size=font_size)
+    cells = [f"{nome}", f"{graduacao}", f"{comportamento}"]
+    for i, c in enumerate(cells):
+        pdf.cell(widths[i], row_height, txt=c, border=1)
+    pdf.ln(row_height)
     
     pdf.ln(5)  # Espaço após tabela
 
@@ -125,9 +146,11 @@ for idx, row in df_selected.iterrows():
 
     pdf.set_font("Arial", 'BU', 12)
     pdf.cell(0, 8, "Observações importantes: ", ln=True)
-    pdf.set_font("Arial", size=12)
-    pdf.multi_cell(0, 5, "Segue anexo cópia da FICHA DISCIPLINAR INDIVIDUAL devidamente autenticada pelo Oficial Chefe da SJD da unidade.")
-    pdf.multi_cell(0, 5, "Segue também anexo, a justificativa circunstanciada considerando o conceito EXCELENTE (ver isso) atribuído ao militar.")
+
+    if len(conceitos) >= 5 and all(str(c).strip().upper() == 'EXCELENTE' for c in conceitos):
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 5, "Segue anexo cópia da FICHA DISCIPLINAR INDIVIDUAL devidamente autenticada pelo Oficial Chefe da SJD da unidade.")
+        pdf.multi_cell(0, 5, "Segue também anexo, a justificativa circunstanciada considerando o conceito EXCELENTE atribuído ao militar.")
 
     pdf.set_font("Arial", 'B', 12)
     hoje = datetime.today().strftime('%d/%m/%Y')
@@ -199,35 +222,36 @@ for idx, row in df_selected.iterrows():
 
     pdf.ln(6)
 
-    # segunda folha
-    pdf.add_page()
-    pdf.set_font("Arial", 'BU', 12)
-    pdf.cell(0, 5, "ANEXO A FICHA DE INFORMAÇÃO E AVALIAÇÃO DE CONCEITO", ln=True, align='C')
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(0, 5, f"({nome})", ln=True, align='C')
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(0, 8, "JUSTIFICATIVA QUANTO AO CONCEITO EXCELENTE (ver isso):", ln=True, align='C')
-    pdf.set_font("Arial", '', 12)
-    pdf.multi_cell(0, 5, "Acredito que esse campo tem que relativo. Ver isso aqui. Excelente Policial Militar dedicado e comprometido com a função que exerce, possui senso de responsabilidade, é disciplinado e educado, além de pontual. Apresenta iniciativa para as atividades inerentes ao bom andamento do serviço, busca soluções para os problemas quando apresentados. Demonstra-se sempre pronto para o serviço, preocupando-se em bem executá-lo. Dentro das suas funções, demonstra habilidade e eficiência. Possui postura ilibada na sociedade em que convive, representando bem a PMPR.")
-
-    pdf.ln(6)
-
-    MESES = {
-        1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
-        5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
-        9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
-    }
-
-    hoje = datetime.today()
-    data_formatada = f"União da Vitória, {hoje.day} de {MESES[hoje.month]} de {hoje.year}."
-
-    pdf.cell(0, 8, f"{data_formatada}", ln=True, align='C')
-    pdf.ln(8)
-    pdf.cell(0, 5, "_____________________________________________", ln=True, align='C')
-    pdf.set_font("Arial", '', 12)
-    pdf.cell(0, 5, "Ten.- Cel. QOEM PM Luiz Antonio Ferreira Junior,", ln=True, align='C')
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(0, 5, "Comandante do 27º BPM/4º CRPM", ln=True, align='C')
+    # segunda folha (anexo de justificativa) — somente se todos os conceitos forem "EXCELENTE"
+    if len(conceitos) >= 5 and all(str(c).strip().upper() == 'EXCELENTE' for c in conceitos):
+        pdf.add_page()
+        pdf.set_font("Arial", 'BU', 12)
+        pdf.cell(0, 5, "ANEXO A FICHA DE INFORMAÇÃO E AVALIAÇÃO DE CONCEITO", ln=True, align='C')
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(0, 5, f"({nome})", ln=True, align='C')
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(0, 8, "JUSTIFICATIVA QUANTO AO CONCEITO EXCELENTE:", ln=True, align='C')
+        pdf.set_font("Arial", '', 12)
+        pdf.multi_cell(0, 5, "Excelente Policial Militar dedicado e comprometido com a função que exerce, possui senso de responsabilidade, é disciplinado e educado, além de pontual. Apresenta iniciativa para as atividades inerentes ao bom andamento do serviço, busca soluções para os problemas quando apresentados. Demonstra-se sempre pronto para o serviço, preocupando-se em bem executá-lo. Dentro das suas funções, demonstra habilidade e eficiência. Possui postura ilibada na sociedade em que convive, representando bem a PMPR.")
+    
+        pdf.ln(6)
+    
+        MESES = {
+            1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
+            5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
+            9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+        }
+    
+        hoje = datetime.today()
+        data_formatada = f"União da Vitória, {hoje.day} de {MESES[hoje.month]} de {hoje.year}."
+    
+        pdf.cell(0, 8, f"{data_formatada}", ln=True, align='C')
+        pdf.ln(8)
+        pdf.cell(0, 5, "_____________________________________________", ln=True, align='C')
+        pdf.set_font("Arial", '', 12)
+        pdf.cell(0, 5, "Ten.- Cel. QOEM PM Luiz Antonio Ferreira Junior,", ln=True, align='C')
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(0, 5, "Comandante do 27º BPM/4º CRPM", ln=True, align='C')
 
 
     # Salva PDF
