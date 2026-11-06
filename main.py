@@ -319,7 +319,7 @@ for idx, row in df_selected.iterrows():
     pdf.ln(8)
     pdf.cell(0, 8, "_____________________________________________", ln=True, align='C')
     pdf.set_font("Arial", '', 12)
-    pdf.cell(0, 5, "1º Ten. QOEM PM Alaor Elias de Faria Junior,", ln=True, align='C')
+    pdf.cell(0, 5, "2º Ten. QOEPM Irlei Frankowski,", ln=True, align='C')
     pdf.set_font("Arial", 'B', 12)
     pdf.cell(0, 5, "Resp. p/ Chefia da SJD do 27º BPM/4º CRPM", ln=True, align='C')
 
